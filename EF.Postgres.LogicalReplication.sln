@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{29C43D18-781E-42B4-AD8C-6E89B66FAE22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF.Postgres.LogicalReplication.UnitTests", "tests\EF.Postgres.LogicalReplication.UnitTests\EF.Postgres.LogicalReplication.UnitTests.csproj", "{8AF24D63-35C6-4EB9-B620-5ED7864D994F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9E81F5CE-6EA7-4C05-A995-2FCC9F6F71B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF.Postgres.LogicalReplication.Example", "src\EF.Postgres.LogicalReplication.Example\EF.Postgres.LogicalReplication.Example.csproj", "{08404F49-205C-411D-9673-3061353179C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EF.Postgres.LogicalReplication", "src\EF.Postgres.LogicalReplication\EF.Postgres.LogicalReplication.csproj", "{51924635-9A7C-45E8-A307-541AEAC00A6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8AF24D63-35C6-4EB9-B620-5ED7864D994F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AF24D63-35C6-4EB9-B620-5ED7864D994F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AF24D63-35C6-4EB9-B620-5ED7864D994F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AF24D63-35C6-4EB9-B620-5ED7864D994F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08404F49-205C-411D-9673-3061353179C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08404F49-205C-411D-9673-3061353179C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08404F49-205C-411D-9673-3061353179C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08404F49-205C-411D-9673-3061353179C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51924635-9A7C-45E8-A307-541AEAC00A6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51924635-9A7C-45E8-A307-541AEAC00A6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51924635-9A7C-45E8-A307-541AEAC00A6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51924635-9A7C-45E8-A307-541AEAC00A6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8AF24D63-35C6-4EB9-B620-5ED7864D994F} = {29C43D18-781E-42B4-AD8C-6E89B66FAE22}
+		{08404F49-205C-411D-9673-3061353179C6} = {9E81F5CE-6EA7-4C05-A995-2FCC9F6F71B4}
+		{51924635-9A7C-45E8-A307-541AEAC00A6B} = {9E81F5CE-6EA7-4C05-A995-2FCC9F6F71B4}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,3 @@
+{
+    "dotnet.defaultSolution": "EF.Postgres.LogicalReplication.sln"
+}
