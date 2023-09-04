@@ -1,37 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.CompilerServices;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+[assembly:InternalsVisibleTo("EF.Postgres.LogicalReplication.UnitTests")]
 
 namespace EF.Postgres.LogicalReplication;
 
-internal class LogicalReplicationListener<TDbContext, TEntity> : IHostedService, IDisposable
+internal class LogicalReplicationListener<TDbContext, TEntity> : BackgroundService
     where TDbContext : DbContext
     where TEntity : class, new()
 {
-    private bool _disposedValue;
     private readonly Subscription<TEntity> _subscription;
 
-    public LogicalReplicationListener(IServiceProvider serviceProvider,
+    public LogicalReplicationListener(TDbContext dbContext,
         IInsertHandler<TEntity> insertHandler,
         INamingConventions? naming = null)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(dbContext);
         ArgumentNullException.ThrowIfNull(insertHandler);
 
         IEntityType entityType;
         string connectionString;
 
-        using (IServiceScope scope = serviceProvider.CreateScope())
-        {
-            TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
+        entityType = dbContext.Model.FindEntityType(typeof(TEntity))
+            ?? throw new Exception("Unknown entity type");
 
-            entityType = dbContext.Model.FindEntityType(typeof(TEntity))
-                ?? throw new Exception("Unknown entity type");
-
-            connectionString = dbContext.Database.GetConnectionString()
-                ?? throw new Exception("Could not resolve connection string for DB context");
-        }
+        connectionString = dbContext.Database.GetConnectionString()
+            ?? throw new Exception("Could not resolve connection string for DB context");
 
         string tableName = entityType.GetTableName()
             ?? throw new Exception("Could not resolve table name for entity type");
@@ -52,42 +49,8 @@ internal class LogicalReplicationListener<TDbContext, TEntity> : IHostedService,
             });
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _subscription.StartListening(cancellationToken);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                // TODO: dispose managed state (managed objects)
-            }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
-            _disposedValue = true;
-        }
-    }
-
-    // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-    // ~LogicalReplicationListener()
-    // {
-    //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-    //     Dispose(disposing: false);
-    // }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        await _subscription.StartListening(stoppingToken);
     }
 }
