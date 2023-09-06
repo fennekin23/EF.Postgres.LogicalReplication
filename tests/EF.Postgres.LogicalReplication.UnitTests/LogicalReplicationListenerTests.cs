@@ -20,9 +20,9 @@ public class LogicalReplicationListenerTests : IAsyncLifetime
         _sut = new LogicalReplicationListener<AppDbContext, Book>(_dbContext, _insertHandler);
     }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
-        await _sut.StartAsync(CancellationToken.None);
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
@@ -34,10 +34,10 @@ public class LogicalReplicationListenerTests : IAsyncLifetime
     public async Task InsertingNewItemShouldBeObserved()
     {
         // Arrange
-        Book book = new() { Id = 1, Title = "Boom 1" };
+        Book book = GetEntity();
+        await _dbContext.Books.Where(b => b.Id == book.Id).ExecuteDeleteAsync();
 
-        _dbContext.Books.Remove(book);
-        await _dbContext.SaveChangesAsync();
+        await _sut.StartAsync(CancellationToken.None);
 
         // Act
         _dbContext.Books.Add(book);
@@ -48,6 +48,9 @@ public class LogicalReplicationListenerTests : IAsyncLifetime
 
         await _insertHandler.Received().Handle(Arg.Is<Book>(b => b.Id == book.Id && b.Title == book.Title), Arg.Any<CancellationToken>());
     }
+
+    private static Book GetEntity() =>
+        new() { Id = Random.Shared.Next(1, 100), Title = Guid.NewGuid().ToString("N") };
 
     private static async Task Wait(Func<bool> waitWhile, TimeSpan waitTimeOut)
     {
