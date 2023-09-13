@@ -4,11 +4,11 @@ namespace EF.Postgres.LogicalReplication;
 
 internal class Management(string connectionString)
 {
-    public async Task CreatePublication(string publicationName, string tableName, CancellationToken cancellationToken)
+    public async Task CreatePublication(string publicationName, string schemaName, string tableName, CancellationToken cancellationToken)
     {
         await using var dataSource = NpgsqlDataSource.Create(connectionString);
         NpgsqlCommand command = dataSource.CreateCommand(
-            $"CREATE PUBLICATION {publicationName} FOR TABLE {tableName}");
+            $"CREATE PUBLICATION {publicationName} FOR TABLE  {schemaName}.\"{tableName}\" WITH (publish = 'insert')");
 
         await command.ExecuteNonQueryAsync(cancellationToken);
     }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Hosting;
 
-[assembly:InternalsVisibleTo("EF.Postgres.LogicalReplication.UnitTests")]
+[assembly: InternalsVisibleTo("EF.Postgres.LogicalReplication.UnitTests")]
 
 namespace EF.Postgres.LogicalReplication;
 
@@ -16,10 +16,12 @@ internal class LogicalReplicationListener<TDbContext, TEntity> : BackgroundServi
 
     public LogicalReplicationListener(TDbContext dbContext,
         IInsertHandler<TEntity> insertHandler,
-        INamingConventions? naming = null)
+        INamingConventions naming,
+        LogicalReplicationListenerOptions options)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
         ArgumentNullException.ThrowIfNull(insertHandler);
+        ArgumentNullException.ThrowIfNull(naming);
 
         IEntityType entityType;
         string connectionString;
@@ -27,13 +29,15 @@ internal class LogicalReplicationListener<TDbContext, TEntity> : BackgroundServi
         entityType = dbContext.Model.FindEntityType(typeof(TEntity))
             ?? throw new Exception("Unknown entity type");
 
-        connectionString = dbContext.Database.GetConnectionString()
+        connectionString = options.ConnectionString
+            ?? dbContext.Database.GetConnectionString()
             ?? throw new Exception("Could not resolve connection string for DB context");
+
+        string schemaName = entityType.GetSchema()
+            ?? "public";
 
         string tableName = entityType.GetTableName()
             ?? throw new Exception("Could not resolve table name for entity type");
-
-        INamingConventions namingConventions = naming ?? new DefaultNamingConventions(tableName);
 
         _subscription = new(
             new EntityMapper<TEntity>(
@@ -42,9 +46,10 @@ internal class LogicalReplicationListener<TDbContext, TEntity> : BackgroundServi
             new SubscriptionOptions
             {
                 ConnectionString = connectionString,
-                CreateReplication = false,
-                PublicationName = namingConventions.GetPublicationName(),
-                ReplicationSlotName = namingConventions.GetSlotName(),
+                CreateDatabasePublication = options.CreateDatabasePublication,
+                PublicationName = naming.GetPublicationName(),
+                ReplicationSlotName = naming.GetSlotName(),
+                SchemaName = schemaName,
                 TableName = tableName
             });
     }

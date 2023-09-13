@@ -5,11 +5,11 @@ namespace EF.Postgres.LogicalReplication;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddLogicalReplicationListener<TDbContext, TEntity>(this IServiceCollection services)
+    public static IServiceCollection AddLogicalReplicationListener<TDbContext, TEntity>(this IServiceCollection services, Action<LogicalReplicationListenerOptions>? configure = null)
         where TDbContext : DbContext
         where TEntity : class, new()
     {
-        services.AddHostedService<LogicalReplicationListener<TDbContext, TEntity>>(sp =>
+        services.AddHostedService(sp =>
         {
             LogicalReplicationListener<TDbContext, TEntity> listener;
 
@@ -17,9 +17,12 @@ public static class IServiceCollectionExtensions
             {
                 TDbContext dbContext = scope.ServiceProvider.GetRequiredService<TDbContext>();
                 IInsertHandler<TEntity> insertHandler = sp.GetRequiredService<IInsertHandler<TEntity>>();
-                INamingConventions? namingConventions = sp.GetService<INamingConventions>();
+                INamingConventions namingConventions = sp.GetService<INamingConventions>() ?? new DefaultNamingConventions(typeof(TEntity).Name.ToLower());
 
-                listener = new LogicalReplicationListener<TDbContext, TEntity>(dbContext, insertHandler, namingConventions);
+                LogicalReplicationListenerOptions options = new();
+                configure?.Invoke(options);
+
+                listener = new LogicalReplicationListener<TDbContext, TEntity>(dbContext, insertHandler, namingConventions, options);
             }
 
             return listener;

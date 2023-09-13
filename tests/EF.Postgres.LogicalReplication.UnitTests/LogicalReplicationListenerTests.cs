@@ -17,7 +17,11 @@ public class LogicalReplicationListenerTests : IAsyncLifetime
 
         _insertHandler = Substitute.For<IInsertHandler<Book>>();
 
-        _sut = new LogicalReplicationListener<AppDbContext, Book>(_dbContext, _insertHandler);
+        _sut = new LogicalReplicationListener<AppDbContext, Book>(
+            _dbContext,
+            _insertHandler,
+            new DefaultNamingConventions("book_test"),
+            new LogicalReplicationListenerOptions { CreateDatabasePublication = true });
     }
 
     public Task InitializeAsync()
@@ -62,6 +66,7 @@ public class LogicalReplicationListenerTests : IAsyncLifetime
         while (waitWhile() && waitCounter < waitLimit)
         {
             await Task.Delay(delay);
+            waitCounter++;
         }
     }
 }

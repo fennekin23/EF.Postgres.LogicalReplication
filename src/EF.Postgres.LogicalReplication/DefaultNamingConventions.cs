@@ -1,9 +1,9 @@
 ﻿namespace EF.Postgres.LogicalReplication;
 
-internal class DefaultNamingConventions(string tableName) : INamingConventions
+internal class DefaultNamingConventions(string prefix) : INamingConventions
 {
-    private readonly string _publication = $"{tableName.ToLowerInvariant()}_publication";
-    private readonly string _slot = $"{tableName.ToLowerInvariant()}_slot";
+    private readonly string _publication = $"{prefix.ToLowerInvariant()}_publication";
+    private readonly string _slot = $"{prefix.ToLowerInvariant()}_slot";
 
     public string GetPublicationName() => _publication;
 

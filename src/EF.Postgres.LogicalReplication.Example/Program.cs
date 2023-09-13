@@ -11,7 +11,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             .AddDbContext<AppDbContext>(o =>
                 o.UseNpgsql(hostBuilder.Configuration.GetConnectionString("AppContext")));
         services
-            .AddLogicalReplicationListener<AppDbContext, Book>()
+            .AddLogicalReplicationListener<AppDbContext, Book>(o => o.CreateDatabasePublication = true)
             .AddSingleton<IInsertHandler<Book>, InsertBookHandler>();
     })
     .ConfigureLogging(logging =>
